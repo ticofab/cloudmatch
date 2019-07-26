@@ -40,12 +40,12 @@ class Device(myLocation: Location) extends Actor with LogSupport {
       if (device != self && myLocation.isCloseEnoughTo(itsLocation)) {
         matchedDevice = Some(device)
         logMatched(self, device)
-        down ! s"I found a match with device '${device.path.name}'!"
+        down ! tellMatched(device)
         device ! YouMatchedWith(self)
       }
 
     case YouMatchedWith(device) =>
-      down ! s"I got notified that I matched with device '${device.path.name}'!"
+      down ! tellMatched(device)
       logMatched(self, device)
 
     case MessageForMatchedDevice(msg) =>
@@ -53,12 +53,13 @@ class Device(myLocation: Location) extends Actor with LogSupport {
       matchedDevice.foreach(_ ! msg)
 
     case msg: Message =>
-      debug(s"received a message for my device: $msg")
+      debug(s"received a message for my own device: $msg")
       down ! msg.content
   }
 
   // logs that this phone matched with another phone
   def logMatched(me: ActorRef, it: ActorRef): Unit = info(s"phone ${me.path.name}, matched with phone ${it.path.name}")
+  def tellMatched(matchedWith: ActorRef): String = s"I matched with device '${matchedWith.path.name}'!"
 
 }
 

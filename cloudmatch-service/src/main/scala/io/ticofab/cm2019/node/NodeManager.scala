@@ -1,6 +1,6 @@
 package io.ticofab.cm2019.node
 
-import akka.actor.{Actor, Props, RootActorPath}
+import akka.actor.{Actor, Props}
 import akka.pattern.{ask, pipe}
 import akka.stream.SourceRef
 import io.ticofab.cm2019.common.Messages.{CheckMatchingWith, DeviceActorReady, DeviceConnected, RegisterNode}
