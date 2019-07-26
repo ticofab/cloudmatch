@@ -1,0 +1,27 @@
+.apicall {
+    width: 1000px;
+}
+
+.result-api-call {
+    font-family: monospace;
+    font-size: 12px;
+}
+
+.received-stuff {
+    font-family: sans-serif;
+    font-size: 13px;
+}
+
+.received-stuff-header {
+    font-family: sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.tftable {font-family: sans-serif;font-size:12px;color:#333333;width:90%;border-width: 1px;border-color: #729ea5;border-collapse: collapse;}
+.tftable th {font-size:12px;background-color:#acc8cc;border-width: 1px;padding: 8px;border-style: solid;border-color: #729ea5;text-align:left;}
+.tftable tr {background-color:#d4e3e5;}
+.tftable td {font-size:12px;border-width: 1px;padding: 4px;border-style: solid;border-color: #729ea5;}
+.vertical-header {font-weight: bold;}
+
+.table-input {width: 100px;}
