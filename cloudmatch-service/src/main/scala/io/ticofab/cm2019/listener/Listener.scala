@@ -39,10 +39,10 @@ class Listener extends Actor with LogSupport {
 
       (chosenNode ? dc) (3.seconds)
         .mapTo[DeviceActorReady]
-        .map { case DeviceActorReady(manager, deviceActor, itsLocation, sourceRef) =>
+        .map { case DeviceActorReady(manager, deviceActor, deviceLocation, messagesSource) =>
 
           // some side effecting stuff
-          debug(s"device actor is ready for location $itsLocation: $deviceActor")
+          debug(s"device actor is ready for location $deviceLocation: $deviceActor")
           val updatedLoad = nodes.getOrElse(manager, 0) + 1
           nodes = nodes + (manager -> updatedLoad)
 
@@ -54,7 +54,7 @@ class Listener extends Actor with LogSupport {
             // TODO: see if I can make it work with Akka Cluster Bootstrap
           }
 
-          nodes.foreach { case (node, _) => node ! CheckMatchingWith(deviceActor, itsLocation) }
+          nodes.foreach { case (node, _) => node ! CheckMatchingWith(deviceActor, deviceLocation) }
 
           // create and send flow back
           Flow.fromGraph(GraphDSL.create() { implicit b =>
@@ -65,7 +65,7 @@ class Listener extends Actor with LogSupport {
                 case _ => Future.failed(new Exception("yuck"))
               })
 
-            val pubSrc = b.add(sourceRef.map(TextMessage(_)))
+            val pubSrc = b.add(messagesSource.map(TextMessage(_)))
 
             textMsgFlow ~> Sink.foreach[String](s => deviceActor ! MessageForMatchedDevice(Message(s)))
             FlowShape(textMsgFlow.in, pubSrc.out)
