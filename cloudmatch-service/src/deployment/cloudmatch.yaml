@@ -1,0 +1,137 @@
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: cloudmatch
+    name: cloudmatch
+  name: cloudmatch-node
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: cloudmatch
+  # rolling update by replacing one instance after the other with max. of 3 replicas at a time
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  # mark the deployment as failed, if not finished in 60 seconds
+  progressDeadlineSeconds: 60
+  template:
+    metadata:
+      labels:
+        app: cloudmatch
+        actorSystemName: cloudmatch
+    spec:
+      # Termination grace period calculates as:
+      # Internal shutdown timeout (10) + preStop timeout (8) + 5 seconds buffer time
+      terminationGracePeriodSeconds: 23
+      containers:
+        - name: cloudmatch
+          image: cloudmatch:1.0.0
+          # Remove for a real project, the image is picked up locally for the integratio test
+          imagePullPolicy: Never
+          ports:
+            # akka remoting
+            - name: remoting
+              containerPort: 25520
+              protocol: TCP
+            # akka-management bootstrap
+            - name: management
+              containerPort: 8558
+              protocol: TCP
+            # cloudmatch http server
+            - name: service
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /system/readiness
+              port: service
+            # It will take at least 15 seconds that the app is started. Hence, perform the first readiness check after this time.
+            initialDelaySeconds: 15
+            timeoutSeconds: 2
+            periodSeconds: 2
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              scheme: HTTP
+              path: /system/liveness
+              port: service
+            # Give the app 30 seconds time to start up before performing the first liveness check.
+            initialDelaySeconds: 30
+            timeoutSeconds: 2
+            periodSeconds: 5
+            failureThreshold: 3
+
+
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: cloudmatch
+    name: cloudmatch
+  name: cloudmatch-listener
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudmatch
+  # rolling update by replacing one instance after the other with max. of 3 replicas at a time
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  # mark the deployment as failed, if not finished in 60 seconds
+  progressDeadlineSeconds: 60
+  template:
+    metadata:
+      labels:
+        app: cloudmatch
+        actorSystemName: cloudmatch
+    spec:
+      # Termination grace period calculates as:
+      # Internal shutdown timeout (10) + preStop timeout (8) + 5 seconds buffer time
+      terminationGracePeriodSeconds: 23
+      containers:
+        - name: cloudmatch
+          image: cloudmatch:1.0.0
+          # Remove for a real project, the image is picked up locally for the integratio test
+          imagePullPolicy: Never
+          env:
+            - name: ROLE
+              value: "listener"
+          ports:
+            # akka remoting
+            - name: remoting
+              containerPort: 25520
+              protocol: TCP
+            # akka-management bootstrap
+            - name: management
+              containerPort: 8558
+              protocol: TCP
+            # cloudmatch server
+            - name: service
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /system/readiness
+              port: service
+            # It will take at least 15 seconds that the app is started. Hence, perform the first readiness check after this time.
+            initialDelaySeconds: 15
+            timeoutSeconds: 2
+            periodSeconds: 2
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              scheme: HTTP
+              path: /system/liveness
+              port: service
+            # Give the app 30 seconds time to start up before performing the first liveness check.
+            initialDelaySeconds: 30
+            timeoutSeconds: 2
+            periodSeconds: 5
+            failureThreshold: 3

@@ -19,4 +19,6 @@ object Messages {
 
   case class Message(content: String)
 
+  case object Welcome
+
 }
