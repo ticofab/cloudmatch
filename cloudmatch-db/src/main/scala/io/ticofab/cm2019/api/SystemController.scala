@@ -1,10 +1,10 @@
-package io.ticofab.cm2019.common.api
+package io.ticofab.cm2019.api
 
-import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.server.{Directives, Route}
 import wvlet.log.LogSupport
 
-object SystemController extends Controller with LogSupport {
-  override val route: Route =
+object SystemController extends Directives with LogSupport {
+  val route: Route =
     extractClientIP { ip =>
       val clientIp = ip.toOption.map(_.getHostAddress).getOrElse("unknown")
       pathPrefix("system") {
