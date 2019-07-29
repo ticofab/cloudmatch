@@ -1,4 +1,4 @@
-package io.ticofab.cm2019.api
+package io.ticofab.cm2019.model
 
 case class Event(deviceId: String,
                  eventType: String,

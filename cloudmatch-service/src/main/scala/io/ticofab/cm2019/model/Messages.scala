@@ -1,4 +1,4 @@
-package io.ticofab.cm2019.common
+package io.ticofab.cm2019.model
 
 import akka.actor.ActorRef
 import akka.stream.SourceRef
@@ -7,7 +7,7 @@ object Messages {
 
   case object RegisterNode
 
-  case class DeviceConnected(location: Location)
+  case class DeviceConnected(id: String, location: Location)
 
   case class DeviceActorReady(manager: ActorRef, deviceActor: ActorRef, location: Location, sourceRef: SourceRef[String])
 

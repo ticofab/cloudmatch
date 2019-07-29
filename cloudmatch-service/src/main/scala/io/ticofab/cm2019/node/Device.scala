@@ -1,23 +1,24 @@
 package io.ticofab.cm2019.node
 
-import akka.actor.{Actor, ActorRef, ActorSystem}
+import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import akka.pattern.pipe
 import akka.stream.scaladsl.{Keep, Sink, Source, StreamRefs}
 import akka.stream.{ActorMaterializer, OverflowStrategy}
-import io.ticofab.cm2019.common.Location
-import io.ticofab.cm2019.common.Messages.{CheckMatchingWith, Message, MessageForMatchedDevice, YouMatchedWith}
+import io.ticofab.cm2019.model.Messages.{CheckMatchingWith, Message, MessageForMatchedDevice, YouMatchedWith}
+import io.ticofab.cm2019.model.Location
 import io.ticofab.cm2019.node.NodeManager.{FlowSource, GetFlowSource}
 import wvlet.log.LogSupport
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class Device(myLocation: Location) extends Actor with LogSupport {
+class Device(myId: String, myLocation: Location) extends Actor with LogSupport {
 
   implicit val as: ActorSystem = context.system
   implicit val am: ActorMaterializer = ActorMaterializer()
 
-  info(s"phone actor ${self.path.name} created for location $myLocation")
+  info(s"phone actor ${self.path.name} created for id $myId and location $myLocation")
+  // TODO: send request to db about connectionOpen
 
   val (down: ActorRef, futureFlowSource: Future[FlowSource]) = {
     val (down, publisher) = Source
@@ -51,6 +52,7 @@ class Device(myLocation: Location) extends Actor with LogSupport {
 
     case MessageForMatchedDevice(msg) =>
       debug(s"${self.path.name}, received a message for my matched device: $msg")
+      // TODO: send event to DB about bytes sent
       matchedDevice.foreach(_ ! msg)
 
     case msg: Message =>
@@ -63,5 +65,9 @@ class Device(myLocation: Location) extends Actor with LogSupport {
 
   def tellMatched(matchedWith: ActorRef): String = s"I matched with device '${matchedWith.path.name}'!"
 
+}
+
+object Device{
+  def apply(id: String, location: Location): Props = Props(new Device(id, location))
 }
 

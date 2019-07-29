@@ -2,21 +2,21 @@ package io.ticofab.cm2019.listener
 
 import akka.actor.{Actor, ActorRef, ActorSystem, Props, RootActorPath}
 import akka.cluster.Cluster
-import akka.cluster.ClusterEvent.{InitialStateAsEvents, MemberEvent, MemberUp, UnreachableMember}
+import akka.cluster.ClusterEvent.{InitialStateAsEvents, MemberUp}
 import akka.http.scaladsl.model.ws.{Message, TextMessage}
 import akka.pattern.{ask, pipe}
 import akka.stream.scaladsl.GraphDSL.Implicits._
 import akka.stream.scaladsl.{Flow, GraphDSL, Sink}
 import akka.stream.{ActorMaterializer, FlowShape}
-import io.ticofab.cm2019.common.Messages._
 import io.ticofab.cm2019.config.Config
+import io.ticofab.cm2019.model.Messages._
 import wvlet.log.LogSupport
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
-class Listener(config: Config) extends Actor with LogSupport {
+class Listener extends Actor with LogSupport {
   implicit val as: ActorSystem = context.system
   implicit val am: ActorMaterializer = ActorMaterializer()
 
@@ -68,7 +68,7 @@ class Listener(config: Config) extends Actor with LogSupport {
           nodes = nodes + (manager -> updatedLoad)
 
           // if all nodes have maximum capacity, scale up
-          val maxCapacityReached = nodes.forall { case (_, load) => load == config.maxDevicesPerNode }
+          val maxCapacityReached = nodes.forall { case (_, load) => load == Config.cloudmatch.`max-devices-per-node` }
           if (maxCapacityReached) {
             info("max capacity reached, scaling up")
             // TODO: scale up (add kubernetes controller)
@@ -100,5 +100,5 @@ class Listener(config: Config) extends Actor with LogSupport {
 }
 
 object Listener {
-  def apply(config: Config): Props = Props(new Listener(config: Config))
+  def apply(): Props = Props(new Listener())
 }

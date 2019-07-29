@@ -11,12 +11,12 @@ object SystemController extends Directives with LogSupport {
         path("readiness") {
           get {
             logger.info(s"received readiness request from $clientIp")
-            complete("DB app is ready!")
+            complete("CloudMatch DB is ready!")
           }
         } ~ path("liveness") {
           get {
             logger.info(s"received alive request from $clientIp")
-            complete("DB app is alive!")
+            complete("CloudMatch DB is alive!")
           }
         }
       }

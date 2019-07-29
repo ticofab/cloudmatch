@@ -7,9 +7,9 @@ import akka.http.scaladsl.server.Route
 import akka.pattern.ask
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Flow
-import io.ticofab.cm2019.common.Location
-import io.ticofab.cm2019.common.Messages.DeviceConnected
-import io.ticofab.cm2019.common.api.{Controller, Server, SystemController}
+import io.ticofab.cm2019.api.{Controller, Server, SystemController}
+import io.ticofab.cm2019.model.Location
+import io.ticofab.cm2019.model.Messages.DeviceConnected
 import wvlet.log.LogSupport
 
 import scala.concurrent.duration._
@@ -30,10 +30,10 @@ class DeviceController extends Actor with Controller with LogSupport {
 
   // http server to control the rate per second of inputs
   val route: Route = path("connect") {
-    // curl http://0.0.0.0:8080/connect?lat=1&lon=2
-    parameters("lat".as[Int], "lon".as[Int]) { (lat, lon) =>
+    // curl http://0.0.0.0:8080/connect?id=a&lat=1&lon=2
+    parameters("id".as[String], "lat".as[Int], "lon".as[Int]) { (id, lat, lon) =>
       info(s"phone connected at location ($lat, $lon)")
-      val handlingFlow = (context.parent ? DeviceConnected(Location(lat, lon))) (3.seconds).mapTo[HandlingFlow]
+      val handlingFlow = (context.parent ? DeviceConnected(id, Location(lat, lon))) (3.seconds).mapTo[HandlingFlow]
       onComplete(handlingFlow) {
         case Success(flow) =>
           debug(s"received handling flow back from listener actor")

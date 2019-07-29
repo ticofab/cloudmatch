@@ -7,14 +7,12 @@ import io.ticofab.cm2019.listener.Listener
 import io.ticofab.cm2019.node.NodeManager
 import wvlet.log.LogFormatter.SourceCodeLogFormatter
 import wvlet.log.{LogLevel, LogSupport, Logger}
-import pureconfig.generic.auto._
 
 object CloudMatchService extends App with LogSupport {
   Logger.setDefaultFormatter(SourceCodeLogFormatter)
   Logger.setDefaultLogLevel(LogLevel.DEBUG)
 
-  val config = pureconfig.loadConfigOrThrow[Config]("cloudmatch")
-  info(s"cloudmatch service starting, role: ${config.role}")
+  info(s"cloudmatch service starting, role: ${Config.cloudmatch.role}")
 
   implicit val system: ActorSystem = ActorSystem("cloudmatch")
 
@@ -22,16 +20,17 @@ object CloudMatchService extends App with LogSupport {
 
   // Start application after self member joined the cluster (Up)
   cluster.registerOnMemberUp {
-    logger.info(s"onMember up, config is $config")
+    logger.info(s"onMember up, config is ${Config.cloudmatch}")
   }
 
-  if (config.role == "node") {
+  if (Config.cloudmatch.role == "node") {
     logger.info("starting a node")
     system.actorOf(NodeManager(), "node-manager")
   } else {
     logger.info("starting a listener")
-    system.actorOf(Listener(config), "listener")
+    system.actorOf(Listener(), "listener")
   }
+
 
   bootstrapCluster()
 

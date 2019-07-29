@@ -1,4 +1,4 @@
-package io.ticofab.cm2019.common
+package io.ticofab.cm2019.model
 
 import scala.math.{pow, sqrt}
 

@@ -1,4 +1,4 @@
-package io.ticofab.cm2019.common.api
+package io.ticofab.cm2019.api
 
 import akka.http.scaladsl.server.Route
 import wvlet.log.LogSupport
@@ -11,12 +11,12 @@ object SystemController extends Controller with LogSupport {
         path("readiness") {
           get {
             logger.info(s"received readiness request from $clientIp")
-            complete("ready!")
+            complete("CloudMatch Service is ready!")
           }
         } ~ path("liveness") {
           get {
             logger.info(s"received alive request from $clientIp")
-            complete("alive!")
+            complete("CloudMatch Service is alive!")
           }
         }
       }

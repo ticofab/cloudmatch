@@ -80,13 +80,13 @@ myApp.controller('paramTable', ['$scope', '$log', function ($scope, $log) {
         $scope.$apply();
     }
 
-    $scope.getConnectUrl = function (lat, lon) {
-        return $scope.openWSUrl + "?lat=" + lat + "&lon=" + lon
+    $scope.getConnectUrl = function (id, lat, lon) {
+        return $scope.openWSUrl + "?id=" + id + "&lat=" + lat + "&lon=" + lon
     };
 
     $scope.connect1 = function () {
         $scope.isDisabled1 = true;
-        myConnectUrl = $scope.getConnectUrl($scope.dev1lat, $scope.dev1lon);
+        myConnectUrl = $scope.getConnectUrl($scope.dev1id, $scope.dev1lat, $scope.dev1lon);
         myWebSocket1 = new WebSocket(myConnectUrl);
         myWebSocket1.onmessage = onM1;
 
@@ -98,7 +98,7 @@ myApp.controller('paramTable', ['$scope', '$log', function ($scope, $log) {
 
     $scope.connect2 = function () {
         $scope.isDisabled2 = true;
-        myConnectUrl = $scope.getConnectUrl($scope.dev2lat, $scope.dev2lon);
+        myConnectUrl = $scope.getConnectUrl($scope.dev2id, $scope.dev2lat, $scope.dev2lon);
         myWebSocket2 = new WebSocket(myConnectUrl);
         myWebSocket2.onmessage = onM2;
         myWebSocket2.onopen = onO.bind(null, "isDisabled2");
@@ -107,7 +107,7 @@ myApp.controller('paramTable', ['$scope', '$log', function ($scope, $log) {
 
     $scope.connect3 = function () {
         $scope.isDisabled3 = true;
-        myConnectUrl = $scope.getConnectUrl($scope.dev3lat, $scope.dev3lon);
+        myConnectUrl = $scope.getConnectUrl($scope.dev3id, $scope.dev3lat, $scope.dev3lon);
         myWebSocket3 = new WebSocket(myConnectUrl);
         myWebSocket3.onmessage = onM3;
         myWebSocket3.onopen = onO.bind(null, "isDisabled3");
@@ -116,7 +116,7 @@ myApp.controller('paramTable', ['$scope', '$log', function ($scope, $log) {
 
     $scope.connect4 = function () {
         $scope.isDisabled4 = true;
-        myConnectUrl = $scope.getConnectUrl($scope.dev4lat, $scope.dev4lon);
+        myConnectUrl = $scope.getConnectUrl($scope.dev4id, $scope.dev4lat, $scope.dev4lon);
         myWebSocket4 = new WebSocket(myConnectUrl);
         myWebSocket4.onmessage = onM4;
         myWebSocket4.onopen = onO.bind(null, "isDisabled4");

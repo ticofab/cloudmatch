@@ -1,11 +1,10 @@
 package io.ticofab.cm2019.node
 
-import akka.actor.{Actor, ActorSystem, Props, RootActorPath}
-import akka.cluster.Cluster
+import akka.actor.{Actor, ActorSystem, Props}
 import akka.pattern.{ask, pipe}
 import akka.stream.SourceRef
-import io.ticofab.cm2019.common.Messages.{CheckMatchingWith, DeviceActorReady, DeviceConnected, RegisterNode, Welcome}
-import io.ticofab.cm2019.common.api.{Server, SystemController}
+import io.ticofab.cm2019.api.{Server, SystemController}
+import io.ticofab.cm2019.model.Messages._
 import io.ticofab.cm2019.node.NodeManager.{FlowSource, GetFlowSource}
 import wvlet.log.LogSupport
 
@@ -24,11 +23,11 @@ class NodeManager extends Actor with LogSupport {
       // asks all my kids if they match
       context.children.foreach(_ forward cmw)
 
-    case DeviceConnected(location) =>
+    case DeviceConnected(id, location) =>
       // spawn a new actor for each phone
       logger.info(s"a device connected!")
       val name = s"${self.path.name}_${context.children.size + 1}"
-      val device = context.actorOf(Props(new Device(location)), name)
+      val device = context.actorOf(Device(id, location), name)
       (device ? GetFlowSource) (3.seconds)
         .mapTo[FlowSource]
         .map(flowSource => DeviceActorReady(self, device, location, flowSource.ref))

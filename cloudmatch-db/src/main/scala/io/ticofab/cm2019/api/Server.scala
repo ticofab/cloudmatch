@@ -1,7 +1,7 @@
 package io.ticofab.cm2019.api
 
-import akka.actor.{ActorSystem, CoordinatedShutdown}
 import akka.actor.CoordinatedShutdown.UnknownReason
+import akka.actor.{ActorSystem, CoordinatedShutdown}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.{Directives, Route}
 import akka.stream.ActorMaterializer
@@ -17,7 +17,7 @@ class Server(route: Route)(implicit system: ActorSystem) extends LogSupport with
 
   private val shutdown = CoordinatedShutdown(system)
   private val address = "0.0.0.0"
-  private val port = 8080
+  private val port = 8081
 
   Http()
     .bindAndHandle(route, address, port)

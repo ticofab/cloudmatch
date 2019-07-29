@@ -5,6 +5,11 @@ function initStuff(scope) {
     scope.port = "8080";
     scope.openWSUrl = scope.protocol + "://" + scope.serverUrl + ":" + scope.port + "/v1/open";
 
+    scope.dev1id = "a";
+    scope.dev2id = "b";
+    scope.dev3id = "c";
+    scope.dev4id = "d";
+
     scope.dev1lat = "1";
     scope.dev2lat = "1";
     scope.dev3lat = "1";

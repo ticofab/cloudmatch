@@ -1,4 +1,4 @@
-package io.ticofab.cm2019.common.api
+package io.ticofab.cm2019.api
 
 import akka.Done
 import akka.actor.{ActorSystem, CoordinatedShutdown}
