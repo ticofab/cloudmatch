@@ -3,20 +3,28 @@ package io.ticofab.cm2019
 import java.util.UUID
 
 import akka.actor.ActorSystem
+import akka.http.scaladsl.model.HttpHeader.ParsingResult.Ok
+import akka.http.scaladsl.model.StatusCode
+import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.server.Directives
+import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
+import io.circe.generic.auto._
 import io.ticofab.cm2019.api.{Event, Server, SystemController}
+import io.ticofab.cm2019.model.{PEvent, State}
 import slick.jdbc.H2Profile.api._
 import wvlet.log.LogFormatter.SourceCodeLogFormatter
 import wvlet.log.{LogLevel, LogSupport, Logger}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.{Failure, Success, Try}
+import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 object CloudMatchDbApp extends App with Directives with LogSupport {
 
   Logger.setDefaultFormatter(SourceCodeLogFormatter)
   Logger.setDefaultLogLevel(LogLevel.DEBUG)
 
+  // DB SETUP
   val db = Database.forConfig("h2mem1")
 
   class Events(tag: Tag) extends Table[(String, String, String, Int)](tag, "EVENTS") {
@@ -33,41 +41,52 @@ object CloudMatchDbApp extends App with Directives with LogSupport {
 
   val events = TableQuery[Events]
 
-  import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
-  import io.circe.generic.auto._
+  db.run(DBIO.seq(
+    // Create the table, including keys
+    events.schema.create
+  )).onComplete {
+    case Success(_) => logger.info(s"table creation operation successful")
+    case Failure(err) => logger.error("table creation operation failed", err)
+  }
 
-  val route = path("event") {
-    post {
-      entity(as[Event]) { foo =>
-        db.run(DBIO.seq(
-          events += (UUID.randomUUID().toString, foo.deviceId, foo.eventType, foo.amount)
-        )).onComplete(logDbOpOutcome("event insertion"))
-        complete("Thanks!")
+  // test
+  //  db.run(events += (UUID.randomUUID().toString, "1", "bytesSent", 300))
+  //    .flatMap(_ => db.run(events += (UUID.randomUUID().toString, "1", "bytesSent", 400)))
+  //    .flatMap(_ => db.run(events += (UUID.randomUUID().toString, "2", "bytesSent", 400)))
+  //  db.run(events.result).foreach(seq => println("all seq " + seq))
+  //  db.run(events.filter(_.deviceId === "2").result).foreach(seq => println("one seq: " + seq))
+
+  // routes to listen to events
+  val route = pathPrefix("device") {
+    path("event") {
+      post {
+        entity(as[Event]) { event =>
+          onComplete(db.run(events += (UUID.randomUUID().toString, event.deviceId, event.eventType, event.amount))) {
+            case Success(_) => complete("Thanks!")
+            case Failure(error) => complete((InternalServerError, "Failure: " + error.getMessage))
+          }
+        }
       }
-    } ~ get {
-      path(Segment) { deviceId =>
-        for {
-          event <- events if event.deviceId.toString() == deviceId
-        } yield ()
-          complete("yo")
+    } ~ path("state" / Segment) { deviceId =>
+      get {
+        val futureState = db.run(events.filter(_.deviceId === deviceId).result).map(seq =>
+          seq.map(PEvent.apply).foldLeft(State(deviceId, 0, 0))((stateAcc, currentEvent) => currentEvent.eventType match {
+            case "connectionOpen" => State(deviceId, stateAcc.connectionsOpen + currentEvent.amount, stateAcc.bytesSent)
+            case "bytesSent" => State(deviceId, stateAcc.connectionsOpen, stateAcc.bytesSent + currentEvent.amount)
+            case unknownType => throw new Exception(s"unknown event type $unknownType")
+          }))
+        onComplete(futureState) {
+          case Success(state) =>
+            if (state.isEmpty) complete((NotFound, s"deviceId $deviceId could not be found"))
+            else complete(state)
+          case Failure(error) => complete((InternalServerError, "Failure: " + error.getMessage))
+        }
       }
     }
   }
 
   implicit val as: ActorSystem = ActorSystem("cloudmatch")
   new Server(route ~ SystemController.route)
-
-  db.run(DBIO.seq(
-    // Create the table, including keys
-    events.schema.create
-  )).onComplete(logDbOpOutcome("table creation"))
-
-  def logDbOpOutcome(op: String): PartialFunction[Try[Unit], Unit] = {
-    case Success(_) => logger.info(s"db operation successful: $op")
-    case Failure(err) => logger.error(s"operation failed: $op", err)
-  }
-
-
 }
 
 
