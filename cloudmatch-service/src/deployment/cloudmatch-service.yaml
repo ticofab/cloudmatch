@@ -2,15 +2,13 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  labels:
-    app: cloudmatch
-    name: cloudmatch
   name: cloudmatch-node
 spec:
   replicas: 3
   selector:
     matchLabels:
       app: cloudmatch
+      tier: node
   # rolling update by replacing one instance after the other with max. of 3 replicas at a time
   strategy:
     type: RollingUpdate
@@ -23,13 +21,14 @@ spec:
     metadata:
       labels:
         app: cloudmatch
+        tier: node
         actorSystemName: cloudmatch
     spec:
       # Termination grace period calculates as:
       # Internal shutdown timeout (10) + preStop timeout (8) + 5 seconds buffer time
       terminationGracePeriodSeconds: 23
       containers:
-        - name: cloudmatch
+        - name: cloudmatch-node
           image: cloudmatch-service:1.0.0
           imagePullPolicy: Never
           ports:
@@ -69,15 +68,13 @@ spec:
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  labels:
-    app: cloudmatch
-    name: cloudmatch
   name: cloudmatch-listener
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: cloudmatch
+      tier: listener
   # rolling update by replacing one instance after the other with max. of 3 replicas at a time
   strategy:
     type: RollingUpdate
@@ -90,13 +87,14 @@ spec:
     metadata:
       labels:
         app: cloudmatch
+        tier: listener
         actorSystemName: cloudmatch
     spec:
       # Termination grace period calculates as:
       # Internal shutdown timeout (10) + preStop timeout (8) + 5 seconds buffer time
       terminationGracePeriodSeconds: 23
       containers:
-        - name: cloudmatch
+        - name: cloudmatch-listener
           image: cloudmatch-service:1.0.0
           imagePullPolicy: Never
           env:
@@ -143,7 +141,8 @@ metadata:
 spec:
   type: LoadBalancer
   selector:
-    app: cloudmatch-listener
+    app: cloudmatch
+    tier: listener
   ports:
     - name: http
       protocol: TCP

@@ -31,7 +31,6 @@ object CloudMatchService extends App with LogSupport {
     system.actorOf(Listener(), "listener")
   }
 
-
   bootstrapCluster()
 
   def bootstrapCluster()(implicit system: ActorSystem): Unit = {

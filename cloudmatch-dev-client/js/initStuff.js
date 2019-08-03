@@ -2,8 +2,7 @@ function initStuff(scope) {
 
     scope.serverUrl = "localhost";
     scope.protocol = "ws";
-    scope.port = "8080";
-    scope.openWSUrl = scope.protocol + "://" + scope.serverUrl + ":" + scope.port + "/v1/open";
+    scope.port = "80";
 
     scope.dev1id = "a";
     scope.dev2id = "b";

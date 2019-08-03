@@ -15,7 +15,7 @@ spec:
     metadata:
       labels:
         app: cloudmatch-db
-        actorSystemName: cloudmatch-db
+        actorSystemName: cloudmatch
     spec:
       # Termination grace period calculates as:
       # Internal shutdown timeout (10) + preStop timeout (8) + 5 seconds buffer time

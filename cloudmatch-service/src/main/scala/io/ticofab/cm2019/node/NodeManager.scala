@@ -15,7 +15,7 @@ class NodeManager extends Actor with LogSupport {
   info(s"starting, $self")
 
   implicit val as: ActorSystem = context.system
-  new Server(SystemController.route)
+  new Server(SystemController.route(self.path.name))
 
   override def receive: Receive = {
 
