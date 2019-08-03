@@ -29,18 +29,20 @@ class DeviceController extends Actor with Controller with LogSupport {
   implicit val am: ActorMaterializer = ActorMaterializer()
 
   // http server to control the rate per second of inputs
-  val route: Route = path("connect") {
-    // curl http://0.0.0.0:8080/connect?id=a&lat=1&lon=2
-    parameters("id".as[String], "lat".as[Int], "lon".as[Int]) { (id, lat, lon) =>
-      info(s"phone connected at location ($lat, $lon)")
-      val handlingFlow = (context.parent ? DeviceConnected(id, Location(lat, lon))) (3.seconds).mapTo[HandlingFlow]
-      onComplete(handlingFlow) {
-        case Success(flow) =>
-          debug(s"received handling flow back from listener actor")
-          handleWebSocketMessages(flow)
-        case Failure(err) =>
-          error(s"error in receiving handling flow back ${err.getMessage}", err)
-          complete(HttpResponse(StatusCodes.InternalServerError))
+  val route: Route = pathPrefix("device") {
+    path("connect") {
+      // curl http://0.0.0.0:8080/connect?id=a&lat=1&lon=2
+      parameters("id".as[String], "lat".as[Int], "lon".as[Int]) { (id, lat, lon) =>
+        info(s"phone connected at location ($lat, $lon)")
+        val handlingFlow = (context.parent ? DeviceConnected(id, Location(lat, lon))) (3.seconds).mapTo[HandlingFlow]
+        onComplete(handlingFlow) {
+          case Success(flow) =>
+            debug(s"received handling flow back from listener actor")
+            handleWebSocketMessages(flow)
+          case Failure(err) =>
+            error(s"error in receiving handling flow back ${err.getMessage}", err)
+            complete(HttpResponse(StatusCodes.InternalServerError))
+        }
       }
     }
   }

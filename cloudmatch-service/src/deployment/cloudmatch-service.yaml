@@ -30,8 +30,7 @@ spec:
       terminationGracePeriodSeconds: 23
       containers:
         - name: cloudmatch
-          image: cloudmatch:1.0.0
-          # Remove for a real project, the image is picked up locally for the integratio test
+          image: cloudmatch-service:1.0.0
           imagePullPolicy: Never
           ports:
             # akka remoting
@@ -98,8 +97,7 @@ spec:
       terminationGracePeriodSeconds: 23
       containers:
         - name: cloudmatch
-          image: cloudmatch:1.0.0
-          # Remove for a real project, the image is picked up locally for the integratio test
+          image: cloudmatch-service:1.0.0
           imagePullPolicy: Never
           env:
             - name: ROLE

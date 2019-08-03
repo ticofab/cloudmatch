@@ -6,7 +6,7 @@ lazy val `cloudmatch-service` =
     .settings(
       libraryDependencies ++= {
         lazy val akkaVersion = "2.5.23"
-        lazy val akkaHttpVersion = "10.1.9"
+        lazy val akkaHttpVersion = "10.1.8"
         lazy val akkaManagementVersion = "1.0.1"
 
         Seq(
