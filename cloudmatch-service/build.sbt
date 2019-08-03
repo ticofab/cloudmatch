@@ -1,4 +1,4 @@
-lazy val `cloudmatch` =
+lazy val `cloudmatch-service` =
   project
     .in(file("."))
     .enablePlugins(DockerPlugin, JavaAppPackaging)
@@ -34,15 +34,15 @@ lazy val `cloudmatch` =
         )
       },
       version := "1.0.0",
-      name := "cloudmatch",
+      name := "cloudmatch-service",
       organization := "ticofab.io",
       scalaVersion := "2.13.0"
     )
 
 lazy val dockerSettings =
   Seq(
-    packageSummary := "Trip Service",
-    packageDescription := "Handling trips",
+    packageSummary := "Cloudmatch Service",
+    packageDescription := "Handling device connections",
     dockerExposedPorts := Seq(8080, 8558),
     dockerBaseImage := "openjdk:11-jdk"
   )

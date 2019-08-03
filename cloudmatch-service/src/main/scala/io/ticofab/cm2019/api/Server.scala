@@ -1,8 +1,7 @@
 package io.ticofab.cm2019.api
 
-import akka.Done
+import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.{ActorSystem, CoordinatedShutdown}
-import akka.actor.CoordinatedShutdown.{PhaseServiceRequestsDone, UnknownReason}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.{Directives, Route}
 import akka.stream.ActorMaterializer

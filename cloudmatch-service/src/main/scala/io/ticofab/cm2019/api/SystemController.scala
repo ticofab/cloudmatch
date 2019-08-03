@@ -11,12 +11,12 @@ object SystemController extends Controller with LogSupport {
         path("readiness") {
           get {
             logger.info(s"received readiness request from $clientIp")
-            complete("CloudMatch Service is ready!")
+            complete("CloudMatch Service is ready!\n")
           }
         } ~ path("liveness") {
           get {
             logger.info(s"received alive request from $clientIp")
-            complete("CloudMatch Service is alive!")
+            complete("CloudMatch Service is alive!\n")
           }
         }
       }
