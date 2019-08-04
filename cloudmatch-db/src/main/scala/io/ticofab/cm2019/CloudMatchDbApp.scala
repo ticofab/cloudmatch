@@ -7,8 +7,8 @@ import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.server.Directives
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 import io.circe.generic.auto._
-import io.ticofab.cm2019.api.{Event, Server, SystemController}
-import io.ticofab.cm2019.model.{PEvent, State}
+import io.ticofab.cm2019.api.{Event, Server, State, SystemController}
+import io.ticofab.cm2019.model.PEvent
 import slick.jdbc.H2Profile.api._
 import wvlet.log.LogFormatter.SourceCodeLogFormatter
 import wvlet.log.{LogLevel, LogSupport, Logger}
@@ -73,7 +73,7 @@ object CloudMatchDbApp extends App with Directives with LogSupport {
             logger.info(s"get device state request from ip $clientIp. device: $deviceId")
             val futureState = db.run(events.filter(_.deviceId === deviceId).result).map(seq =>
               seq.map(PEvent.apply).foldLeft(State(deviceId, 0, 0))((stateAcc, currentEvent) => currentEvent.eventType match {
-                case "connectionOpen" => State(deviceId, stateAcc.connectionsOpen + currentEvent.amount, stateAcc.bytesSent)
+                case "connectionsOpen" => State(deviceId, stateAcc.connectionsOpen + currentEvent.amount, stateAcc.bytesSent)
                 case "bytesSent" => State(deviceId, stateAcc.connectionsOpen, stateAcc.bytesSent + currentEvent.amount)
                 case unknownType => throw new Exception(s"unknown event type $unknownType")
               }))
