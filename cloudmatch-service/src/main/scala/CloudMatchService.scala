@@ -2,9 +2,9 @@ import akka.actor.ActorSystem
 import akka.cluster.Cluster
 import akka.management.cluster.bootstrap.ClusterBootstrap
 import akka.management.scaladsl.AkkaManagement
-import io.ticofab.cm2019.config.Config
-import io.ticofab.cm2019.listener.Listener
-import io.ticofab.cm2019.node.NodeManager
+import io.ticofab.cm2019.service.config.Config
+import io.ticofab.cm2019.service.listener.Listener
+import io.ticofab.cm2019.service.node.NodeManager
 import wvlet.log.LogFormatter.SourceCodeLogFormatter
 import wvlet.log.{LogLevel, LogSupport, Logger}
 
