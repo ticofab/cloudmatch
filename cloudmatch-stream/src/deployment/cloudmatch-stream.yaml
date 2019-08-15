@@ -1,0 +1,84 @@
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: cloudmatch-stream
+    name: cloudmatch-stream
+  name: cloudmatch-stream
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudmatch-stream
+  template:
+    metadata:
+      labels:
+        app: cloudmatch-stream
+        actorSystemName: cloudmatch
+    spec:
+      # Termination grace period calculates as:
+      # Internal shutdown timeout (10) + preStop timeout (8) + 5 seconds buffer time
+      terminationGracePeriodSeconds: 23
+      volumes:
+        - name: amqp-config
+          secret:
+            secretName: amqp-user-pass
+      containers:
+        - name: cloudmatch-stream
+          image: cloudmatch-stream:1.0.0
+          volumeMounts:
+            - name: amqp-config
+              mountPath: "/etc/amqp-config"
+              readOnly: true
+          env:
+            - name: AMQP_USER
+              valueFrom:
+                secretKeyRef:
+                  name: amqp-user-pass
+                  key: username
+            - name: AMQP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: amqp-user-pass
+                  key: password
+          # Remove for a real project, the image is picked up locally for the integration test
+          imagePullPolicy: Never
+          ports:
+            # cloudmatch db server
+            - name: service
+              containerPort: 8085
+          readinessProbe:
+            httpGet:
+              path: /system/readiness
+              port: service
+            # It will take at least 15 seconds that the app is started. Hence, perform the first readiness check after this time.
+            initialDelaySeconds: 15
+            timeoutSeconds: 2
+            periodSeconds: 2
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              scheme: HTTP
+              path: /system/liveness
+              port: service
+            # Give the app 30 seconds time to start up before performing the first liveness check.
+            initialDelaySeconds: 30
+            timeoutSeconds: 2
+            periodSeconds: 5
+            failureThreshold: 3
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudmatch-stream-svc
+spec:
+  type: LoadBalancer
+  selector:
+    app: cloudmatch-stream
+  ports:
+    - name: http
+      protocol: TCP
+      port: 85
+      targetPort: 8085
