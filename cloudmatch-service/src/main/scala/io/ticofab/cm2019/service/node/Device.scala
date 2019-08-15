@@ -9,6 +9,7 @@ import akka.stream.{ActorMaterializer, OverflowStrategy}
 import io.ticofab.cm2019.service.model.Messages.{CheckMatchingWith, Message, MessageForMatchedDevice, YouMatchedWith}
 import io.ticofab.cm2019.service.model.{Event, JsonSupport, Location}
 import io.ticofab.cm2019.service.node.NodeManager.{FlowSource, GetFlowSource}
+import io.ticofab.cm2019.service.node.Publisher.Publish
 import spray.json._
 import wvlet.log.LogSupport
 
@@ -17,7 +18,7 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
-class Device(myId: String, myLocation: Location) extends Actor with JsonSupport with LogSupport {
+class Device(myId: String, myLocation: Location, publisher: ActorRef) extends Actor with JsonSupport with LogSupport {
 
   implicit val as: ActorSystem = context.system
   implicit val am: ActorMaterializer = ActorMaterializer()
@@ -64,6 +65,7 @@ class Device(myId: String, myLocation: Location) extends Actor with JsonSupport 
 
     case msg: Message =>
       debug(s"${self.path.name}, received a message for my own device from ${sender.path.name}: $msg")
+      publisher ! Publish(msg.content.length.toString)
       down ! s"device ${sender.path.name} says: ${msg.content}"
   }
 
@@ -87,6 +89,6 @@ class Device(myId: String, myLocation: Location) extends Actor with JsonSupport 
 }
 
 object Device {
-  def apply(id: String, location: Location): Props = Props(new Device(id, location))
+  def apply(id: String, location: Location, publisher: ActorRef): Props = Props(new Device(id, location, publisher))
 }
 

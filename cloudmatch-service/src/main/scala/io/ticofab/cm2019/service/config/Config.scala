@@ -11,7 +11,12 @@ object Config {
                               `db-base-url`: String,
                               role: String)
 
+  case class AmqpConfig(`queue-name`: String,
+                        username: String,
+                        password: String)
+
   val cloudmatch: CloudMatchConfig = config.as[CloudMatchConfig]("cloudmatch")
+  val amqp      : AmqpConfig       = config.as[AmqpConfig]("amqp")
 }
 
 

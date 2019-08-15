@@ -4,7 +4,7 @@ import akka.actor.{Actor, ActorSystem, Props}
 import akka.pattern.{ask, pipe}
 import akka.stream.SourceRef
 import io.ticofab.cm2019.service.api.{Server, SystemController}
-import io.ticofab.cm2019.service.model.Messages.{CheckMatchingWith, DeviceActorReady, DeviceConnected, RegisterNode, Welcome}
+import io.ticofab.cm2019.service.model.Messages._
 import io.ticofab.cm2019.service.node.NodeManager.{FlowSource, GetFlowSource}
 import wvlet.log.LogSupport
 
@@ -14,6 +14,10 @@ import scala.concurrent.duration._
 class NodeManager extends Actor with LogSupport {
   info(s"starting, $self")
 
+  // create this node's publisher
+  val publisher = context.actorOf(Publisher(), "publisher")
+
+  // create this node's http server
   implicit val as: ActorSystem = context.system
   new Server(SystemController.route(self.path.name))
 
@@ -26,8 +30,8 @@ class NodeManager extends Actor with LogSupport {
     case DeviceConnected(id, location) =>
       // spawn a new actor for each phone
       logger.info(s"a device connected!")
-      val name = s"${self.path.name}_${context.children.size + 1}"
-      val device = context.actorOf(Device(id, location), name)
+      val name   = s"${self.path.name}_${context.children.size + 1}"
+      val device = context.actorOf(Device(id, location, publisher), name)
       (device ? GetFlowSource) (3.seconds)
         .mapTo[FlowSource]
         .map(flowSource => DeviceActorReady(self, device, location, flowSource.ref))

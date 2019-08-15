@@ -27,9 +27,28 @@ spec:
       # Termination grace period calculates as:
       # Internal shutdown timeout (10) + preStop timeout (8) + 5 seconds buffer time
       terminationGracePeriodSeconds: 23
+      volumes:
+        - name: amqp-config
+          secret:
+            secretName: amqp-user-pass
       containers:
         - name: cloudmatch-node
           image: cloudmatch-service:1.0.0
+          volumeMounts:
+            - name: amqp-config
+              mountPath: "/etc/amqp-config"
+              readOnly: true
+          env:
+            - name: AMQP_USER
+              valueFrom:
+                secretKeyRef:
+                  name: amqp-user-pass
+                  key: username
+            - name: AMQP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: amqp-user-pass
+                  key: password
           imagePullPolicy: Never
           ports:
             # akka remoting

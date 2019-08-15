@@ -24,6 +24,9 @@ lazy val `cloudmatch-service` =
           "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion,
           "io.spray" %%  "spray-json" % "1.3.5",
 
+          // AMQP
+          "com.newmotion" %% "akka-rabbitmq" % "5.1.1",
+
           // CONFIG
           "com.iheart" %% "ficus" % "1.4.7",
 

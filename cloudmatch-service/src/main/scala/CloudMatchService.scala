@@ -4,7 +4,7 @@ import akka.management.cluster.bootstrap.ClusterBootstrap
 import akka.management.scaladsl.AkkaManagement
 import io.ticofab.cm2019.service.config.Config
 import io.ticofab.cm2019.service.listener.Listener
-import io.ticofab.cm2019.service.node.NodeManager
+import io.ticofab.cm2019.service.node.{NodeManager, Publisher}
 import wvlet.log.LogFormatter.SourceCodeLogFormatter
 import wvlet.log.{LogLevel, LogSupport, Logger}
 
