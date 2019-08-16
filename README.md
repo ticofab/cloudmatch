@@ -24,7 +24,7 @@ The core of the project. I talked about this architecture at lots of conferences
 
 [![Reactive From Code to Cloud](https://img.youtube.com/vi/FyneQrH-0Rc/0.jpg)](https://youtu.be/FyneQrH-0Rc?t=1901)
 
-The idea is to have a Listener service which provide an endpoing for connecting devices, and then each device will live on a node of a cluster. The actors representing different devices will exchange messages carrying the sent payloads.
+The idea is to have a Listener service which provide an endpoint for connecting devices. Then we have a set of clustered nodes where each connected device is represented by an actor. These actors will exchange messages carrying the payloads sent by matched devices.
 
 ![Cloudmatch aervice architecture](https://raw.githubusercontent.com/ticofab/cloudmatch/master/images/cloudmatch-service-architecture.png)
 
