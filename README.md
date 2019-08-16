@@ -20,7 +20,7 @@ The project consists of a few items:
 
 ### cloudmatch-service
 
-The core of the project. I talked about this architecture at lots of conferences - notably during the online webinar with Lightbend:
+The core of the project. I talked about this architecture at lots of conferences - notably during the online webinar with Lightbend. Click on the image below to view the recording.
 
 [![Reactive From Code to Cloud](https://img.youtube.com/vi/FyneQrH-0Rc/0.jpg)](https://youtu.be/FyneQrH-0Rc?t=1901)
 
