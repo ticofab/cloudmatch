@@ -14,7 +14,6 @@ lazy val `cloudmatch-service` =
           "com.typesafe.akka" %% "akka-actor" % akkaVersion,
           "com.typesafe.akka" %% "akka-stream" % akkaVersion,
           "com.typesafe.akka" %% "akka-cluster" % akkaVersion,
-
           "com.lightbend.akka.management" %% "akka-management-cluster-bootstrap" % akkaManagementVersion,
           "com.typesafe.akka" %% "akka-discovery" % akkaVersion,
           "com.lightbend.akka.discovery" %% "akka-discovery-kubernetes-api" % akkaManagementVersion,
