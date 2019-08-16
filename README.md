@@ -1,6 +1,6 @@
 # CloudMatch
 
-This is an re-implementation of the engine powering my former startup [CloudMatch](http://cloudmatch.github.io/)
+This is an re-implementation of the engine powering my former startup [CloudMatch](http://cloudmatch.github.io/).
 The idea is to allow entities to establish a connection and then exchange data via a Websocket connection. This project is currently a learning playground.
 
 * Scala
