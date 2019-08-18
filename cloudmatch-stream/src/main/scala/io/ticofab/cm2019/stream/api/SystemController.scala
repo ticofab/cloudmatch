@@ -10,12 +10,12 @@ object SystemController extends Directives with LogSupport {
       pathPrefix("system") {
         path("readiness") {
           get {
-            logger.info(s"received readiness request from $clientIp")
+            logger.debug(s"received readiness request from $clientIp")
             complete("CloudMatch Stream is ready!\n")
           }
         } ~ path("liveness") {
           get {
-            logger.info(s"received alive request from $clientIp")
+            logger.debug(s"received alive request from $clientIp")
             complete("CloudMatch Stream is alive!\n")
           }
         }

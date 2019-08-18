@@ -1,11 +1,14 @@
 #!/bin/bash
 
-# package the latest docker images
-(cd cloudmatch-db/; sbt docker:publishLocal; cd ..)
-(cd cloudmatch-service/; sbt docker:publishLocal; cd ..)
-(cd cloudmatch-stream/; sbt docker:publishLocal; cd ..)
+# clean all services from the cluster
+CLEAN_SCRIPT="clean-cluster.sh"
+echo "executing "$CLEAN_SCRIPT
+. "$CLEAN_SCRIPT"
 
-# deploy all the things!
-kubectl apply -f cloudmatch-db/src/deployment/cloudmatch-db.yaml
-kubectl apply -f cloudmatch-service/src/deployment/cloudmatch-service.yaml
-kubectl apply -f cloudmatch-stream/src/deployment/cloudmatch-stream.yaml
+# deploy all services
+SERVICE_SCRIPT="deploy-service.sh"
+
+echo "deploying services with "$SERVICE_SCRIPT
+. "$SERVICE_SCRIPT" cloudmatch-service
+. "$SERVICE_SCRIPT" cloudmatch-db
+. "$SERVICE_SCRIPT" cloudmatch-stream
